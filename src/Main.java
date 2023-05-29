@@ -3,23 +3,17 @@ import java.util.Scanner;
 
 public class Main {
     static Scanner scanner = new Scanner(System.in);
-    static ArrayList<Integer> cubes = new ArrayList<>();
-    static int cube_1;
-    static int cube_2;
-    static int cube_3;
-    static int cube_4;
-    static int cube_5;
+    static int[] cubes = new int[5];
 
 
     public static void main(String[] args) {
-        menu();
+        playerMove();
+
 
     }
 
 
-
-
-    // ход пользователя
+// сделать рнадомайзер для номеров кубиков, а не только для чисел на них. Доделать ход компа [переделать рандомизацию ходов и доделать до конца]
 
     // ход компьютера
     //проверка хода
@@ -31,8 +25,7 @@ public class Main {
         do {
             String inputStart = scanner.nextLine();
             if (inputStart.equals("1")) {
-                roll();
-                changeValuePlayer();
+
                 break;
             } else if (inputStart.equals("0")) {
                 System.exit(0);
@@ -42,18 +35,28 @@ public class Main {
         } while (true);
     }
 
+
+    public static void playerMove() {
+        roll();
+        changeValuePlayer();
+        checkCombinations();
+    }
+
+    public static void computerMove() {
+        roll();
+        changeValueComputer();
+        checkCombinations();
+
+    }
+
+
     public static void roll() {
         int count = 1;
 
-        cubes.add(cube_1);
-        cubes.add(cube_2);
-        cubes.add(cube_3);
-        cubes.add(cube_4);
-        cubes.add(cube_5);
-
-        for (Integer cubeCount : cubes) {
-            cubeCount = getRandomDiceNumber();
-            System.out.println(" [" +  count + "]");
+        for (int cubeCount : cubes) {
+            cubeCount = getRandomDiceValue();
+            cubes[count - 1] = cubeCount;
+            System.out.println(" [" + count + "]");
             printCubes(cubeCount);
             System.out.println();
             System.out.println();
@@ -61,12 +64,18 @@ public class Main {
         }
     }
 
-    public static int getRandomDiceNumber() {
+
+    public static int getRandomDiceValue() {
         return (int) (Math.random() * 6) + 1;
     }
 
-    public static void printCubes(int count){
-        switch (count){
+    public static int getRandomQuantity() {
+        return (int) (Math.random() * 5);
+    }
+
+
+    public static void printCubes(int count) {
+        switch (count) {
             case 1:
                 System.out.println(" ___");
                 System.out.println("| * |");
@@ -100,7 +109,8 @@ public class Main {
         }
     }
 
-    public static void changeValuePlayer(){
+
+    public static void changeValuePlayer() {
         String exit = "Чтобы закончить ввод нажмите ENTER еще раз";
         String change = "Вы изменили значение кубика ";
         System.out.println("Введите порядковые номера кубиков, значение которые вы хотели бы изменить через ENTER:");
@@ -111,45 +121,54 @@ public class Main {
             String value = scanner.nextLine();
 
 
-            if(value.equals("")){
-                printCubes(cube_1);
-                printCubes(cube_2);
-                printCubes(cube_3);
-                printCubes(cube_4);
-                printCubes(cube_5);
+            if (value.equals("")) {
+                System.out.println(" [1]");
+                printCubes(cubes[0]);
+                System.out.println();
+                System.out.println(" [2]");
+                printCubes(cubes[1]);
+                System.out.println();
+                System.out.println(" [3]");
+                printCubes(cubes[2]);
+                System.out.println();
+                System.out.println(" [4]");
+                printCubes(cubes[3]);
+                System.out.println();
+                System.out.println(" [5]");
+                printCubes(cubes[4]);
                 break;
             }
 
             intValue = Integer.parseInt(value);
 
 
-            for(Integer inputedValue : inputList){
-                if (inputedValue == intValue){
+            for (Integer inputedValue : inputList) {
+                if (inputedValue == intValue) {
                     count++;
 
                 }
             }
-            if (count > 0){
+            if (count > 0) {
                 System.out.println("Значение этого кубика вы уже меняли в этом ходу");
             } else {
                 if (intValue == 1) {
-                    cube_1 = getRandomDiceNumber();
+                    cubes[0] = getRandomDiceValue();
                     System.out.println(change + intValue);
                     System.out.println(exit);
                 } else if (intValue == 2) {
-                    cube_2 = getRandomDiceNumber();
+                    cubes[1] = getRandomDiceValue();
                     System.out.println(change + intValue);
                     System.out.println(exit);
                 } else if (intValue == 3) {
-                    cube_3 = getRandomDiceNumber();
+                    cubes[2] = getRandomDiceValue();
                     System.out.println(change + intValue);
                     System.out.println(exit);
                 } else if (intValue == 4) {
-                    cube_4 = getRandomDiceNumber();
+                    cubes[3] = getRandomDiceValue();
                     System.out.println(change + intValue);
                     System.out.println(exit);
                 } else if (intValue == 5) {
-                    cube_5 = getRandomDiceNumber();
+                    cubes[4] = getRandomDiceValue();
                     System.out.println(change + intValue);
                     System.out.println(exit);
                 } else {
@@ -165,10 +184,62 @@ public class Main {
 
     }
 
+    public static void changeValueComputer() {
+        System.out.println("Компьютер выбрал и перебросил кубики \n");
+        int changesValue = getRandomQuantity(); // количество исправлений
+        int number = getRandomQuantity(); // исправляемый кубик
+        int[] cubesNumbersArray = new int[changesValue];
+        for (int i = 0; i < changesValue; i++) {
+            for (int j = 0; j < changesValue; j++) {
+                if (number == cubesNumbersArray[j]) {
+                    do {
+                        number = getRandomQuantity();
+                    } while (number == cubesNumbersArray[j]);
+                }
+            }
+            cubesNumbersArray[i] = number;
+        }
+        for (int i = 0; i < changesValue; i++) {
+            cubes[cubesNumbersArray[i]] = getRandomQuantity();
+        }
+        System.out.println(" [1]");
+        printCubes(cubes[0]);
+        System.out.println();
+        System.out.println(" [2]");
+        printCubes(cubes[1]);
+        System.out.println();
+        System.out.println(" [3]");
+        printCubes(cubes[2]);
+        System.out.println();
+        System.out.println(" [4]");
+        printCubes(cubes[3]);
+        System.out.println();
+        System.out.println(" [5]");
+        printCubes(cubes[4]);
 
+    }
 
 
     public static void checkCombinations() {
+        int count;
+        int value = 0;
+        int points = 0;
+
+
+        //легкие коминации (по значниям)
+        for (int i = 0; i < cubes.length; i++) {
+            count = 0;
+            for (int j = 0; j < cubes.length; j++) {
+
+                if (cubes[i] == cubes[j] && i != j) {
+                    count++;
+                    value = cubes[i];
+                }
+            }
+            points += count * value;
+        }
+        System.out.println(points);
+
 
     }
 
